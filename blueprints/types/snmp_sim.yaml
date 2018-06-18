@@ -1,0 +1,33 @@
+node_types:
+
+  snmp_sim:
+    derived_from: cloudify.nodes.SoftwareComponent
+    properties:
+      nagiosrest_monitoring:
+        type: cloudify.datatypes.nagiosrest.Properties
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/set_runtime_ip.py
+          inputs:
+            ips_file:
+              default: ""
+        start:
+          implementation: scripts/snmpv2c_request_start.sh
+          inputs:
+            ip:
+              default: { get_attribute: [ SELF, ip ] }
+            user:
+              default: ""
+        stop:
+          implementation: scripts/snmp_sim_stop.sh
+        detete:
+          implementation: scripts/clear_runtime_ip.py
+          inputs:
+            ips_file:
+              default: ""
+            ip:
+              default: { get_attribute: [ SELF, ip ] }
+      cloudify.interfaces.monitoring:
+        start: nagiosrest.nagiosrest_plugin.tasks.add_monitoring
+        stop: nagiosrest.nagiosrest_plugin.tasks.remove_monitoring

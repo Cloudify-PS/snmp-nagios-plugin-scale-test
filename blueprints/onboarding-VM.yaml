@@ -1,0 +1,130 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  The blueprint describes an OpenStack vm created using Cloudify's OpenStack plugin
+  and simple web server started using Cloudify's script plugin.
+  In addition, an OpenStack floating ip and security group are created and associated with the created vm.
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/4.3.2/types.yaml
+  - plugin:cloudify-openstack-plugin
+
+inputs:
+  image:
+    description: >
+      A centos 7 image available to the openstack user you set in secrets.
+
+  flavor:
+    description: >
+      A flavor large enough for the centos 7 image to run on.
+
+  agent_user:
+    description: The user name of the agent on the instance created from the image.
+
+  management_network_name:
+    description: Which network to attach this VM to.
+
+  key_name:
+    description: The name of the key on openstack.
+
+  ips:
+    description: array of ip addresses
+
+  fixed_ip:
+    type: string
+    description: Port fixed IP
+
+dsl_definitions:
+  openstack_config: &openstack_config
+    username: { get_secret: keystone_username }
+    password: { get_secret: keystone_password }
+    tenant_name: { get_secret: keystone_tenant_name }
+    auth_url: { get_secret: keystone_url }
+    region: { get_secret: region }
+
+node_templates:
+
+  install_snmp_sim:
+    type: cloudify.nodes.SoftwareComponent
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/install_snmp_sim.sh
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: host
+
+
+  set_ip_aliases:
+    type: cloudify.nodes.SoftwareComponent
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/add_aliases.py
+          inputs:
+            ips: { get_input: ips }
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: host
+
+  host:
+    type: cloudify.openstack.nodes.Server
+    properties:
+      agent_config:
+        user: { get_input: agent_user }
+        install_method: remote
+        port: 22
+        key: { get_secret: agent_key_private }
+      server:
+        image: { get_input: image }
+        flavor: { get_input: flavor }
+        key_name: { get_input: key_name }
+      openstack_config: *openstack_config
+    relationships:
+      - type: cloudify.openstack.server_connected_to_port
+        target: port
+
+
+  net:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *openstack_config
+      use_external_resource: true
+      resource_id: { get_input: management_network_name }
+
+  port:
+    type: cloudify.openstack.nodes.Port
+    properties:
+      openstack_config: *openstack_config
+      fixed_ip: { get_input: fixed_ip }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          inputs:
+            args:
+              port_security_enabled: True
+              allowed_address_pairs:
+                - ip_address: 172.16.0.0/16
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: net
+      - type: cloudify.openstack.port_connected_to_security_group
+        target: security-group
+
+  security-group:
+    type: cloudify.openstack.nodes.SecurityGroup
+    properties:
+      openstack_config: *openstack_config
+      use_external_resource: true
+      resource_id: allow-all
+
+
+outputs:
+  instance_id:
+    value: { get_attribute: [ host, external_id ] }
+  agent_user:
+    value: { get_input: agent_user }
+  key_name:
+    value: { get_input: key_name }
+  ips_file:
+    value: { get_attribute: [ set_ip_aliases, ips_file ] }
