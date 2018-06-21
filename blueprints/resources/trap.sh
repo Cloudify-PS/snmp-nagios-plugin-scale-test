@@ -3,7 +3,7 @@
 NAGIOS_IP=$1
 ip=$2
 
-WAIT=600
+WAIT=1
 
 while true
 do

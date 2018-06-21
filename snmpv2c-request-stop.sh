@@ -5,7 +5,7 @@ VM="onboarding-VM"
 SNMP_TEST="snmpv2c-request-test"
 BLUEPRINT_ID="$VM-request-snmpv2c"
 
-for i in {1..50}
+for i in {1..1}
 do
   cfy executions start uninstall -p ignore_failure=true --allow-custom-parameters -d "$SNMP_TEST-$i"
   cfy deployments delete "$SNMP_TEST-$i"

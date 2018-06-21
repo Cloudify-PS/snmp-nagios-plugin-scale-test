@@ -103,20 +103,9 @@ node_templates:
           inputs:
             args:
               port_security_enabled: False
-#              allowed_address_pairs:
-#                - ip_address: 172.16.0.0/16
     relationships:
       - type: cloudify.relationships.contained_in
         target: net
-      # - type: cloudify.openstack.port_connected_to_security_group
-      #   target: security-group
-
-  # security-group:
-  #   type: cloudify.openstack.nodes.SecurityGroup
-  #   properties:
-  #     openstack_config: *openstack_config
-  #     use_external_resource: true
-  #     resource_id: allow-all
 
 
 outputs:
