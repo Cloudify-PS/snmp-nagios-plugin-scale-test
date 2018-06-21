@@ -1,0 +1,6 @@
+image: 0398a544-d258-4cdc-b244-9c129b3ec641
+flavor: 2e4dab68-2da2-4985-8cad-1c2f25e961c1
+agent_user: centos
+management_network_name: cloudify-monitor
+key_name: Vladimir_Antonovich
+fixed_ip: 10.50.3.1

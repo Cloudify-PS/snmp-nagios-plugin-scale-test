@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-sudo kill -9 `cat /run/$ip.pid`
-sudo rm -f /run/$ip.pid
+sudo kill -9 `cat /tmp/$ip.pid`
+sudo rm -f /tmp/$ip.pid

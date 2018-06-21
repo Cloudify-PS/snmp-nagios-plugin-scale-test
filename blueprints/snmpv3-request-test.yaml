@@ -8,7 +8,7 @@ imports:
   - plugin:cloudify-openstack-plugin
   - plugin:cloudify-utilities-plugin
   - plugin:cloudify-nagiosrest-plugin
-  - types/snmp-sim.yaml
+  - types/snmp_sim.yaml
 
 
 inputs:

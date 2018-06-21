@@ -8,7 +8,7 @@ DEPLOYMENT_ID="$VM-request-snmpv3"
 
 
 cfy install -b "$BLUEPRINT_ID" -d "$DEPLOYMENT_ID" "blueprints/$VM.yaml" \
-  -i "$DEPLOYMENT_ID-inputs.yaml" -i "inputs/ips-v3-request-inputs.yaml"
+  -i "inputs/$DEPLOYMENT_ID-inputs.yaml" -i "inputs/ips-v3-request-inputs.yaml"
 
 cfy blueprints upload -b "$SNMP_TEST" "blueprints/$SNMP_TEST.yaml"
 

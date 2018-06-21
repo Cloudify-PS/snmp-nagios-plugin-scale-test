@@ -8,7 +8,7 @@ imports:
   - plugin:cloudify-openstack-plugin
   - plugin:cloudify-utilities-plugin
   - plugin:cloudify-nagiosrest-plugin
-  - types/snmp-sim.yaml
+  - types/snmp_sim.yaml
 
 inputs:
 
@@ -52,9 +52,12 @@ node_templates:
           implementation: scripts/snmpv2c_trap_start.sh
           inputs:
             NAGIOS_IP: { get_secret: nagiosrest_address }
+            ip: { get_attribute: [SELF, ip]}
+            user: { get_attribute: [ proxy_host, deployment, outputs, agent_user ] }
         detete:
           inputs:
             ips_file: { get_attribute: [ proxy_host, deployment, outputs, ips_file ] }
+            ip: { get_attribute: [SELF, ip]}
     relationships:
       - type: cloudify.relationships.contained_in
         target: host

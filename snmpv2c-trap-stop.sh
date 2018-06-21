@@ -3,7 +3,7 @@
 
 VM="onboarding-VM"
 SNMP_TEST="snmpv2c-trap-test"
-BLUEPRINT_ID="$VM-trap-snmpv2c"
+BLUEPRINT_ID="$VM-snmpv2c-trap"
 
 for i in {1..1}
 do
