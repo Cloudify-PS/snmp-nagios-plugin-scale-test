@@ -54,6 +54,17 @@ node_templates:
       - type: cloudify.relationships.contained_in
         target: host
 
+  configure_snmp_sim:
+    type: cloudify.nodes.SoftwareComponent
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/snmpv2c_request_configure.sh
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: host
+      - type: cloudify.relationships.depends_on
+        target: install_snmp_sim
 
   set_ip_aliases:
     type: cloudify.nodes.SoftwareComponent

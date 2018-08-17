@@ -38,11 +38,11 @@ node_templates:
     capabilities:
       scalable:
         properties:
-          default_instances: { get_input: instances}
+          default_instances: 1
     properties:
       nagiosrest_monitoring:
         target_type: vnf_fake_type_2
-        heal_on_failure: true
+#        heal_on_failure: true
     interfaces:
       cloudify.interfaces.lifecycle:
         create:
@@ -70,6 +70,8 @@ node_templates:
         install_method: remote
         port: 22
         key: { get_secret: agent_key_private }
+        # min_workers: 1
+        # max_workers: 1
       server:
         key_name: { get_attribute: [proxy_host, deployment, outputs, key_name] }
       openstack_config: *openstack_config
@@ -93,3 +95,15 @@ node_templates:
             agent_user: agent_user
             key_name: key_name
             ips_file: ips_file
+
+
+groups:
+  snmp_simulation_group:
+    members: [snmp_simulation]
+
+policies:
+  scale_snmp_simulation:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: { get_input: instances}
+    targets: [snmp_simulation_group]

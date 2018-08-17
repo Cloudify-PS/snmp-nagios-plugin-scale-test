@@ -1,0 +1,3 @@
+scalable_entity_name: "snmp_simulation_group"
+delta: 10
+scale_compute: False
